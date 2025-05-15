@@ -14,16 +14,8 @@ import Signup from "./components/Register";
 
 import "./index.css";
 
-const categories = [
-  "Afrobeats",
-  "Pop",
-  "Hip Hop",
-  "Rock",
-  "Jazz",
-  "Classical",
-  "Country",
-  "Reggae",
-];
+// Only include the working categories
+const categories = ["Afrobeats", "Country", "Reggae"];
 
 const App = () => {
   const [query, setQuery] = useState("");
@@ -50,7 +42,6 @@ const App = () => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
 
-  // Updated search function now accepts explicit search term parameter
   const searchMusic = async (term) => {
     if (!term.trim()) return;
 
@@ -67,10 +58,9 @@ const App = () => {
     }
   };
 
-  // When category clicked, update query state and search using that category term directly
   const handleCategoryClick = (category) => {
-    setQuery(category);      // update the input field with the clicked category
-    searchMusic(category);   // search using the category directly to avoid async issue
+    setQuery(category);
+    searchMusic(category);
   };
 
   const addToFavorites = (song) => {
