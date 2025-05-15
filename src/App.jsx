@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { auth } from "../firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
@@ -14,15 +14,16 @@ import Signup from "./components/Register";
 
 import "./index.css";
 
-// Only include the working categories
 const categories = ["Afrobeats", "Country", "Reggae"];
 
 const App = () => {
   const [query, setQuery] = useState("");
   const [songs, setSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [user, setUser] = useState(null);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
@@ -52,6 +53,8 @@ const App = () => {
       const response = await fetch(url);
       const data = await response.json();
       setSongs(data.results);
+      setCurrentSong(null); // reset current song on new search
+      setCurrentIndex(null);
     } catch (error) {
       console.error("Error fetching data:", error);
       setSongs([]);
@@ -77,6 +80,22 @@ const App = () => {
     setFavorites((prev) => prev.filter((song) => song.trackId !== trackId));
   };
 
+  const playSong = (song, index) => {
+    setCurrentSong(song);
+    setCurrentIndex(index);
+  };
+
+  const handleSongEnd = () => {
+    if (currentIndex !== null && currentIndex + 1 < songs.length) {
+      const nextSong = songs[currentIndex + 1];
+      setCurrentSong(nextSong);
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      setCurrentSong(null); // No more songs
+      setCurrentIndex(null);
+    }
+  };
+
   return (
     <Router>
       <Navbar />
@@ -91,7 +110,6 @@ const App = () => {
                 searchMusic={() => searchMusic(query)}
               />
 
-              {/* Song Categories */}
               <div className="categories-container">
                 <h2>Song Categories</h2>
                 <div className="categories-grid">
@@ -112,12 +130,11 @@ const App = () => {
                 </div>
               </div>
 
-              {/* Search Results */}
               {songs.length > 0 && (
                 <div className="search-results">
                   <h2>Search Results:</h2>
                   <div className="song-grid">
-                    {songs.map((song) => (
+                    {songs.map((song, index) => (
                       <div key={song.trackId} className="card">
                         <img
                           src={song.artworkUrl100}
@@ -126,25 +143,42 @@ const App = () => {
                         />
                         <h3>{song.trackName}</h3>
                         <p>{song.artistName}</p>
+
                         <button
-                          onClick={() => setCurrentSong(song)}
+                          onClick={() => playSong(song, index)}
                           className="play-btn"
                         >
-                          Play Song
+                          Play
                         </button>
+
                         <button
                           onClick={() => addToFavorites(song)}
                           className="favorite-btn"
                         >
                           Add to Favorites
                         </button>
+
+                        <audio
+                          controls
+                          src={song.previewUrl}
+                          style={{ marginTop: "10px", width: "100%" }}
+                        />
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Player Controls */}
+              {/* Player Controls and automatic next song logic */}
+              {currentSong && (
+                <audio
+                  ref={audioRef}
+                  src={currentSong.previewUrl}
+                  autoPlay
+                  onEnded={handleSongEnd}
+                />
+              )}
+
               {currentSong && <PlayerControls song={currentSong} />}
             </>
           }
