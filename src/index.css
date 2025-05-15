@@ -390,3 +390,73 @@ body {
 }
 
 
+/* Favorites Page Container */
+.favorites-container {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+/* Grid layout for favorite songs */
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  padding-top: 30px;
+}
+
+/* Song Card Styling */
+.favorites-grid .card {
+  background-color: var(--card-background);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+}
+
+.favorites-grid .card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.favorites-grid img {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.favorites-grid h3 {
+  font-size: 18px;
+  margin: 10px 0 5px;
+  color: var(--text-color);
+}
+
+.favorites-grid p {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+/* Audio player */
+.favorites-grid audio {
+  width: 100%;
+  margin-top: 10px;
+  outline: none;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .favorites-container {
+    padding: 30px 15px;
+  }
+
+  .favorites-grid {
+    gap: 20px;
+  }
+
+  .favorites-grid .card {
+    padding: 15px;
+  }
+}
