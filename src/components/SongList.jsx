@@ -7,7 +7,7 @@ const SongList = ({ songs, onSelect, addToFavorites }) => {
           <h3>{song.trackName}</h3>
           <p>{song.artistName}</p>
           <button onClick={() => onSelect(song)}>▶️ Play</button>
-          <button onClick={() => addToFavorites(song)}>❤️ Favorite</button>
+          <button onClick={() => addToFavorites(song)}> Favorite</button>
         </div>
       ))}
     </div>
