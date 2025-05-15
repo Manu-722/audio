@@ -32,7 +32,6 @@ const App = () => {
   const [favorites, setFavorites] = useState([]);
   const [user, setUser] = useState(null);
 
-  // Load user auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
@@ -40,7 +39,6 @@ const App = () => {
     return () => unsubscribe();
   }, []);
 
-  // Load favorites from localStorage on mount
   useEffect(() => {
     const storedFavorites = localStorage.getItem("favorites");
     if (storedFavorites) {
@@ -48,17 +46,17 @@ const App = () => {
     }
   }, []);
 
-  // Sync favorites to localStorage when they change
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
 
-  // Search function accepts optional term to bypass stale state issue
-  const searchMusic = async (searchTerm) => {
-    const term = searchTerm ?? query;
+  // Updated search function now accepts explicit search term parameter
+  const searchMusic = async (term) => {
     if (!term.trim()) return;
 
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&limit=20`;
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(
+      term
+    )}&media=music&limit=20`;
     try {
       const response = await fetch(url);
       const data = await response.json();
@@ -69,10 +67,10 @@ const App = () => {
     }
   };
 
-  // When category clicked: update query AND search immediately
+  // When category clicked, update query state and search using that category term directly
   const handleCategoryClick = (category) => {
-    setQuery(category);
-    searchMusic(category);
+    setQuery(category);      // update the input field with the clicked category
+    searchMusic(category);   // search using the category directly to avoid async issue
   };
 
   const addToFavorites = (song) => {
@@ -100,7 +98,7 @@ const App = () => {
               <SearchBar
                 query={query}
                 setQuery={setQuery}
-                searchMusic={() => searchMusic()}
+                searchMusic={() => searchMusic(query)}
               />
 
               {/* Song Categories */}
