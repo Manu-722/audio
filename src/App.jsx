@@ -14,13 +14,6 @@ import Signup from "./components/Register";
 
 import "./index.css";
 
-const categories = [
-  { name: "Afrobeats", term: "afrobeats" },
-  { name: "Pop", term: "pop" },
-  { name: "Hip-Hop", term: "hip hop" },
-  { name: "Rock", term: "rock" },
-];
-
 const App = () => {
   const [query, setQuery] = useState("");
   const [songs, setSongs] = useState([]);
@@ -28,6 +21,19 @@ const App = () => {
   const [favorites, setFavorites] = useState([]);
   const [user, setUser] = useState(null);
 
+  // Song categories
+  const categories = [
+    "Afrobeats",
+    "Hip Hop",
+    "Pop",
+    "Rock",
+    "Jazz",
+    "Classical",
+    "Country",
+    "Electronic",
+  ];
+
+  // Load user auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
@@ -35,6 +41,7 @@ const App = () => {
     return () => unsubscribe();
   }, []);
 
+  // Load favorites from localStorage on mount
   useEffect(() => {
     const storedFavorites = localStorage.getItem("favorites");
     if (storedFavorites) {
@@ -42,30 +49,31 @@ const App = () => {
     }
   }, []);
 
+  // Sync favorites to localStorage when they change
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
 
-  const searchMusic = async (searchTerm = query) => {
-    if (!searchTerm.trim()) return;
+  // Search function accepts optional term parameter (category click or search bar)
+  const searchMusic = async (searchTerm) => {
+    const term = searchTerm !== undefined ? searchTerm : query;
+    if (!term.trim()) return;
 
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(
-      searchTerm
-    )}&media=music&limit=20`;
     try {
+      const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&limit=20`;
       const response = await fetch(url);
       const data = await response.json();
       setSongs(data.results);
-      setQuery(searchTerm); // update the query input with the searched term
     } catch (error) {
       console.error("Error fetching data:", error);
       setSongs([]);
     }
   };
 
-  // Now all categories work
+  // When user clicks category card
   const handleCategoryClick = (category) => {
-    searchMusic(category.term);
+    setQuery(category);
+    searchMusic(category);
   };
 
   const addToFavorites = (song) => {
@@ -93,29 +101,28 @@ const App = () => {
               <SearchBar
                 query={query}
                 setQuery={setQuery}
-                searchMusic={() => searchMusic(query)}
+                searchMusic={() => searchMusic()}
               />
 
               {/* Categories Section */}
-              <section className="categories-section">
+              <div className="categories-section">
                 <h2>Song Categories</h2>
                 <div className="categories-grid">
-                  {categories.map((cat) => (
+                  {categories.map((category) => (
                     <div
-                      key={cat.name}
+                      key={category}
                       className="category-card"
-                      onClick={() => handleCategoryClick(cat)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") handleCategoryClick(cat);
+                      onClick={() => handleCategoryClick(category)}
+                      tabIndex={0} // for keyboard accessibility
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleCategoryClick(category);
                       }}
                     >
-                      <h3>{cat.name}</h3>
+                      {category}
                     </div>
                   ))}
                 </div>
-              </section>
+              </div>
 
               {/* Search Results */}
               {songs.length > 0 && (
