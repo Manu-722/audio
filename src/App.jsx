@@ -6,6 +6,10 @@ import SongList from "./components/SongList";
 import PlayerControls from "./components/PlayerControls";
 import FavoritesPage from "./components/FavoritesPage"; // New Favorites Page
 import PlaylistPage from "./components/PlaylistPage"; // Playlist Page
+import Login from './components/Login';
+import Signup from './components/Register';
+
+
 import "./index.css";
 
 const App = () => {
@@ -38,6 +42,8 @@ const App = () => {
         <Link to="/">Home</Link>
         <Link to="/favorites">Favorites</Link>
         <Link to="/playlist">Playlist</Link>
+        <Link to="/login">Login</Link>
+        <Link to="/register">Register</Link>
       </nav>
       <Routes>
         <Route 
@@ -53,6 +59,10 @@ const App = () => {
         />
         <Route path="/favorites" element={<FavoritesPage favorites={favorites} />} />
         <Route path="/playlist" element={<PlaylistPage />} />
+        <Route path='/login' element={<Login/>}/>
+        <Route path='/register' element={<Signup/>}/>
+        
+        
       </Routes>
     </Router>
   );
