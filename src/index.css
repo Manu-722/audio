@@ -267,5 +267,126 @@ body {
 
 
 
+/* Responsive Styles */
+
+/* Navbar and Nav Links */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nav-links a {
+    font-size: 16px;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 10px;
+  }
+
+  .nav-links a {
+    font-size: 14px;
+    padding: 5px 8px;
+  }
+}
+
+/* Song Grid */
+@media (max-width: 768px) {
+  .song-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    padding: 15px;
+  }
+
+  .card {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .song-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 10px;
+  }
+}
+
+/* Player Controls */
+@media (max-width: 768px) {
+  .player-controls {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .control-btn {
+    font-size: 16px;
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .player-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .control-btn {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+/* Search Container */
+@media (max-width: 768px) {
+  .search-container {
+    flex-direction: column;
+    max-width: 90%;
+  }
+
+  .search-container input {
+    width: 100%;
+  }
+}
+
+/* Auth Pages (Already present, but reinforce) */
+@media (max-width: 768px) {
+  .form-box {
+    padding: 30px 20px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+
+  .form-box {
+    padding: 20px 15px;
+  }
+
+  .form-box h2 {
+    font-size: 20px;
+  }
+
+  .form-box input,
+  .form-box button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .form-box p {
+    font-size: 12px;
+  }
+}
 
 
