@@ -14,24 +14,23 @@ import Signup from "./components/Register";
 
 import "./index.css";
 
+const categories = [
+  "Afrobeats",
+  "Pop",
+  "Hip Hop",
+  "Rock",
+  "Jazz",
+  "Classical",
+  "Country",
+  "Reggae",
+];
+
 const App = () => {
   const [query, setQuery] = useState("");
   const [songs, setSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [user, setUser] = useState(null);
-
-  // Song categories
-  const categories = [
-    "Afrobeats",
-    "Hip Hop",
-    "Pop",
-    "Rock",
-    "Jazz",
-    "Classical",
-    "Country",
-    "Electronic",
-  ];
 
   // Load user auth state
   useEffect(() => {
@@ -54,13 +53,13 @@ const App = () => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
 
-  // Search function accepts optional term parameter (category click or search bar)
+  // Search function accepts optional term to bypass stale state issue
   const searchMusic = async (searchTerm) => {
-    const term = searchTerm !== undefined ? searchTerm : query;
+    const term = searchTerm ?? query;
     if (!term.trim()) return;
 
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&limit=20`;
     try {
-      const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&limit=20`;
       const response = await fetch(url);
       const data = await response.json();
       setSongs(data.results);
@@ -70,7 +69,7 @@ const App = () => {
     }
   };
 
-  // When user clicks category card
+  // When category clicked: update query AND search immediately
   const handleCategoryClick = (category) => {
     setQuery(category);
     searchMusic(category);
@@ -104,21 +103,22 @@ const App = () => {
                 searchMusic={() => searchMusic()}
               />
 
-              {/* Categories Section */}
-              <div className="categories-section">
+              {/* Song Categories */}
+              <div className="categories-container">
                 <h2>Song Categories</h2>
                 <div className="categories-grid">
-                  {categories.map((category) => (
+                  {categories.map((cat) => (
                     <div
-                      key={category}
+                      key={cat}
                       className="category-card"
-                      onClick={() => handleCategoryClick(category)}
-                      tabIndex={0} // for keyboard accessibility
+                      onClick={() => handleCategoryClick(cat)}
+                      role="button"
+                      tabIndex={0}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleCategoryClick(category);
+                        if (e.key === "Enter") handleCategoryClick(cat);
                       }}
                     >
-                      {category}
+                      {cat}
                     </div>
                   ))}
                 </div>
@@ -155,6 +155,8 @@ const App = () => {
                   </div>
                 </div>
               )}
+
+              {/* Player Controls */}
               {currentSong && <PlayerControls song={currentSong} />}
             </>
           }
