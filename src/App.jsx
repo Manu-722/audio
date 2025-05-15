@@ -14,6 +14,13 @@ import Signup from "./components/Register";
 
 import "./index.css";
 
+const categories = [
+  { name: "Afrobeats", term: "afrobeats" },
+  { name: "Pop", term: "pop" },
+  { name: "Hip-Hop", term: "hip hop" },
+  { name: "Rock", term: "rock" },
+];
+
 const App = () => {
   const [query, setQuery] = useState("");
   const [songs, setSongs] = useState([]);
@@ -21,7 +28,6 @@ const App = () => {
   const [favorites, setFavorites] = useState([]);
   const [user, setUser] = useState(null);
 
-  // Load user auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
@@ -29,7 +35,6 @@ const App = () => {
     return () => unsubscribe();
   }, []);
 
-  // Load favorites from localStorage on mount
   useEffect(() => {
     const storedFavorites = localStorage.getItem("favorites");
     if (storedFavorites) {
@@ -37,28 +42,30 @@ const App = () => {
     }
   }, []);
 
-  // Sync favorites to localStorage when they change
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
 
-  const searchMusic = async () => {
-    if (!query.trim()) return;
+  const searchMusic = async (searchTerm = query) => {
+    if (!searchTerm.trim()) return;
 
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=20`;
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(
+      searchTerm
+    )}&media=music&limit=20`;
     try {
       const response = await fetch(url);
       const data = await response.json();
       setSongs(data.results);
+      setQuery(searchTerm); // update the query input with the searched term
     } catch (error) {
       console.error("Error fetching data:", error);
       setSongs([]);
     }
   };
 
+  // Now all categories work
   const handleCategoryClick = (category) => {
-    setQuery(category);
-    setTimeout(() => searchMusic(), 0);
+    searchMusic(category.term);
   };
 
   const addToFavorites = (song) => {
@@ -83,57 +90,64 @@ const App = () => {
           path="/"
           element={
             <>
-              <SearchBar query={query} setQuery={setQuery} searchMusic={searchMusic} />
+              <SearchBar
+                query={query}
+                setQuery={setQuery}
+                searchMusic={() => searchMusic(query)}
+              />
 
-              {/* --- Song Categories --- */}
+              {/* Categories Section */}
               <section className="categories-section">
-                <h2>Browse by Category</h2>
+                <h2>Song Categories</h2>
                 <div className="categories-grid">
-                  {["Pop", "Hip Hop", "Afrobeats", "Jazz"].map((category) => (
-                    <button key={category} onClick={() => handleCategoryClick(category)}>
-                      {category}
-                    </button>
+                  {categories.map((cat) => (
+                    <div
+                      key={cat.name}
+                      className="category-card"
+                      onClick={() => handleCategoryClick(cat)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") handleCategoryClick(cat);
+                      }}
+                    >
+                      <h3>{cat.name}</h3>
+                    </div>
                   ))}
                 </div>
               </section>
 
-              {/* --- Song Reviews --- */}
-              <section className="reviews-section">
-                <h2>What Our Listeners Say</h2>
-                <div className="reviews-grid">
-                  <div className="review-card">
-                    <p>"This app helped me discover new favorite artists! Totally hooked." – Sarah</p>
-                  </div>
-                  <div className="review-card">
-                    <p>"Love the clean design and how easy it is to use." – Mike</p>
-                  </div>
-                  <div className="review-card">
-                    <p>"The favorites feature is a game changer for my daily playlists." – Amina</p>
-                  </div>
-                  <div className="review-card">
-                    <p>"Found all the top Afrobeats jams in one place. 🔥" – David</p>
-                  </div>
-                </div>
-              </section>
-
-              {/* --- Search Results --- */}
+              {/* Search Results */}
               {songs.length > 0 && (
                 <div className="search-results">
                   <h2>Search Results:</h2>
                   <div className="song-grid">
                     {songs.map((song) => (
                       <div key={song.trackId} className="card">
-                        <img src={song.artworkUrl100} alt={song.trackName} className="song-image" />
+                        <img
+                          src={song.artworkUrl100}
+                          alt={song.trackName}
+                          className="song-image"
+                        />
                         <h3>{song.trackName}</h3>
                         <p>{song.artistName}</p>
-                        <button onClick={() => setCurrentSong(song)} className="play-btn">Play Song</button>
-                        <button onClick={() => addToFavorites(song)} className="favorite-btn">Add to Favorites</button>
+                        <button
+                          onClick={() => setCurrentSong(song)}
+                          className="play-btn"
+                        >
+                          Play Song
+                        </button>
+                        <button
+                          onClick={() => addToFavorites(song)}
+                          className="favorite-btn"
+                        >
+                          Add to Favorites
+                        </button>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-
               {currentSong && <PlayerControls song={currentSong} />}
             </>
           }
