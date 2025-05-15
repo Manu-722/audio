@@ -492,3 +492,89 @@ body {
 .remove-btn:hover {
   background-color: #d9363e;
 }
+
+
+
+
+
+
+
+/* Additional Enhancements */
+
+/* Remove Button Focus Style */
+.remove-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.5);
+}
+
+/* Active Nav Link */
+.nav-links a.active {
+  background-color: #004b9a;
+  font-weight: bold;
+}
+
+/* Smooth Theme Transitions */
+.card,
+.form-box,
+input,
+button,
+.control-btn,
+.remove-btn {
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s;
+}
+
+/* Sorting Dropdown Hover */
+.sort-container select:hover {
+  border-color: var(--button-bg);
+}
+
+/* Dark Mode Sorting Dropdown */
+.dark .sort-container select {
+  background-color: #2c2c2c;
+  color: #fff;
+  border-color: #555;
+}
+
+/* Font smoothing and fallback fonts */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Album Art Hover Scale */
+.song-image,
+.favorites-grid img {
+  transition: transform 0.3s ease;
+}
+
+.song-image:hover,
+.favorites-grid img:hover {
+  transform: scale(1.05);
+}
+
+/* Utility Hidden Class */
+.hidden {
+  display: none !important;
+}
+
+/* Very Small Devices (≤ 360px) */
+@media (max-width: 360px) {
+  .form-box {
+    padding: 15px 10px;
+  }
+
+  .form-box input,
+  .form-box button {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .player-controls {
+    gap: 8px;
+  }
+
+  .nav-links a {
+    font-size: 13px;
+  }
+}

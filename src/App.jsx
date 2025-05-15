@@ -56,6 +56,11 @@ const App = () => {
     }
   };
 
+  const handleCategoryClick = (category) => {
+    setQuery(category);
+    setTimeout(() => searchMusic(), 0);
+  };
+
   const addToFavorites = (song) => {
     if (user) {
       if (!favorites.find((fav) => fav.trackId === song.trackId)) {
@@ -79,6 +84,39 @@ const App = () => {
           element={
             <>
               <SearchBar query={query} setQuery={setQuery} searchMusic={searchMusic} />
+
+              {/* --- Song Categories --- */}
+              <section className="categories-section">
+                <h2>Browse by Category</h2>
+                <div className="categories-grid">
+                  {["Pop", "Hip Hop", "Afrobeats", "Jazz"].map((category) => (
+                    <button key={category} onClick={() => handleCategoryClick(category)}>
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              </section>
+
+              {/* --- Song Reviews --- */}
+              <section className="reviews-section">
+                <h2>What Our Listeners Say</h2>
+                <div className="reviews-grid">
+                  <div className="review-card">
+                    <p>"This app helped me discover new favorite artists! Totally hooked." – Sarah</p>
+                  </div>
+                  <div className="review-card">
+                    <p>"Love the clean design and how easy it is to use." – Mike</p>
+                  </div>
+                  <div className="review-card">
+                    <p>"The favorites feature is a game changer for my daily playlists." – Amina</p>
+                  </div>
+                  <div className="review-card">
+                    <p>"Found all the top Afrobeats jams in one place. 🔥" – David</p>
+                  </div>
+                </div>
+              </section>
+
+              {/* --- Search Results --- */}
               {songs.length > 0 && (
                 <div className="search-results">
                   <h2>Search Results:</h2>
@@ -95,6 +133,7 @@ const App = () => {
                   </div>
                 </div>
               )}
+
               {currentSong && <PlayerControls song={currentSong} />}
             </>
           }
@@ -112,10 +151,7 @@ const App = () => {
             )
           }
         />
-        <Route
-          path="/playlist"
-          element={user ? <PlaylistPage /> : <Login />}
-        />
+        <Route path="/playlist" element={user ? <PlaylistPage /> : <Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Signup />} />
       </Routes>
