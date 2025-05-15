@@ -4,7 +4,7 @@ const SongList = ({ songs, onSelect, addToFavorites }) => {
   return (
     <div className="song-grid">
       {songs.length === 0 ? (
-        <p>No songs found. Try another search!</p> // ✅ Display message when empty
+        <p>No songs found. Try another search!</p> 
       ) : (
         songs.map((song) => (
           <div key={song.trackId} className="card">
