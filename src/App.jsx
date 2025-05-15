@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { auth } from "../firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
+
 import Navbar from "./components/Navbar";
 import SearchBar from "./components/SearchBar";
 import SongList from "./components/SongList";
@@ -9,14 +11,15 @@ import FavoritesPage from "./components/FavoritesPage";
 import PlaylistPage from "./components/PlaylistPage";
 import Login from "./components/Login";
 import Signup from "./components/Register";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+
+import "./index.css";
 
 const App = () => {
   const [query, setQuery] = useState("");
   const [songs, setSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
   const [favorites, setFavorites] = useState([]);
-  const [user, setUser] = useState(null); // Track signed-in user
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
@@ -26,6 +29,8 @@ const App = () => {
   }, []);
 
   const searchMusic = async () => {
+    if (!query.trim()) return; // Prevent empty searches
+
     const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=20`;
     try {
       const response = await fetch(url);
@@ -33,6 +38,7 @@ const App = () => {
       setSongs(data.results);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setSongs([]);
     }
   };
 
@@ -49,28 +55,28 @@ const App = () => {
   return (
     <Router>
       <Navbar />
-      <nav className="nav-links">
-        <Link to="/">Home</Link>
-        {user ? (
-          <>
-            <Link to="/favorites">Favorites</Link>
-            <Link to="/playlist">Playlist</Link>
-          </>
-        ) : (
-          <>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
-          </>
-        )}
-      </nav>
       <Routes>
         <Route
           path="/"
           element={
             <>
               <SearchBar query={query} setQuery={setQuery} searchMusic={searchMusic} />
-              <h2>Search Results</h2>
-              <SongList songs={songs} onSelect={setCurrentSong} addToFavorites={addToFavorites} />
+              {songs.length > 0 && (
+                <div className="search-results">
+                  <h2>Search Results:</h2>
+                  <div className="song-grid">
+                    {songs.map((song) => (
+                      <div key={song.trackId} className="card">
+                        <img src={song.artworkUrl100} alt={song.trackName} className="song-image" />
+                        <h3>{song.trackName}</h3>
+                        <p>{song.artistName}</p>
+                        <button onClick={() => setCurrentSong(song)} className="play-btn">Play Song</button>
+                        <button onClick={() => addToFavorites(song)} className="favorite-btn">Add to Favorites</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               {currentSong && <PlayerControls song={currentSong} />}
             </>
           }
