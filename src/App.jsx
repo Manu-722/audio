@@ -5,7 +5,6 @@ import { onAuthStateChanged } from "firebase/auth";
 
 import Navbar from "./components/Navbar";
 import SearchBar from "./components/SearchBar";
-import SongList from "./components/SongList";
 import PlayerControls from "./components/PlayerControls";
 import FavoritesPage from "./components/FavoritesPage";
 import PlaylistPage from "./components/PlaylistPage";
@@ -19,10 +18,12 @@ const categories = ["Afrobeats", "Country", "Reggae"];
 const App = () => {
   const [query, setQuery] = useState("");
   const [songs, setSongs] = useState([]);
-  const [currentSong, setCurrentSong] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [user, setUser] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
+
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -43,17 +44,21 @@ const App = () => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
 
+  useEffect(() => {
+    if (audioRef.current && currentIndex !== null) {
+      audioRef.current.src = songs[currentIndex].previewUrl;
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  }, [currentIndex]);
+
   const searchMusic = async (term) => {
     if (!term.trim()) return;
-
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(
-      term
-    )}&media=music&limit=20`;
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&limit=20`;
     try {
       const response = await fetch(url);
       const data = await response.json();
       setSongs(data.results);
-      setCurrentSong(null); // reset current song on new search
       setCurrentIndex(null);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -80,20 +85,39 @@ const App = () => {
     setFavorites((prev) => prev.filter((song) => song.trackId !== trackId));
   };
 
-  const playSong = (song, index) => {
-    setCurrentSong(song);
+  const playSong = (index) => {
     setCurrentIndex(index);
   };
 
-  const handleSongEnd = () => {
-    if (currentIndex !== null && currentIndex + 1 < songs.length) {
-      const nextSong = songs[currentIndex + 1];
-      setCurrentSong(nextSong);
+  const playNext = () => {
+    if (songs.length === 0) return;
+
+    if (shuffle) {
+      const randomIndex = Math.floor(Math.random() * songs.length);
+      setCurrentIndex(randomIndex);
+    } else if (currentIndex < songs.length - 1) {
       setCurrentIndex(currentIndex + 1);
-    } else {
-      setCurrentSong(null); // No more songs
-      setCurrentIndex(null);
     }
+  };
+
+  const playPrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const togglePlayPause = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const toggleShuffle = () => {
+    setShuffle(!shuffle);
   };
 
   return (
@@ -104,11 +128,7 @@ const App = () => {
           path="/"
           element={
             <>
-              <SearchBar
-                query={query}
-                setQuery={setQuery}
-                searchMusic={() => searchMusic(query)}
-              />
+              <SearchBar query={query} setQuery={setQuery} searchMusic={() => searchMusic(query)} />
 
               <div className="categories-container">
                 <h2>Song Categories</h2>
@@ -120,9 +140,7 @@ const App = () => {
                       onClick={() => handleCategoryClick(cat)}
                       role="button"
                       tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") handleCategoryClick(cat);
-                      }}
+                      onKeyDown={(e) => e.key === "Enter" && handleCategoryClick(cat)}
                     >
                       {cat}
                     </div>
@@ -136,50 +154,34 @@ const App = () => {
                   <div className="song-grid">
                     {songs.map((song, index) => (
                       <div key={song.trackId} className="card">
-                        <img
-                          src={song.artworkUrl100}
-                          alt={song.trackName}
-                          className="song-image"
-                        />
+                        <img src={song.artworkUrl100} alt={song.trackName} className="song-image" />
                         <h3>{song.trackName}</h3>
                         <p>{song.artistName}</p>
-
-                        <button
-                          onClick={() => playSong(song, index)}
-                          className="play-btn"
-                        >
-                          Play
-                        </button>
-
-                        <button
-                          onClick={() => addToFavorites(song)}
-                          className="favorite-btn"
-                        >
-                          Add to Favorites
-                        </button>
-
-                        <audio
-                          controls
-                          src={song.previewUrl}
-                          style={{ marginTop: "10px", width: "100%" }}
-                        />
+                        <button onClick={() => playSong(index)} className="play-btn">Play</button>
+                        <button onClick={() => addToFavorites(song)} className="favorite-btn">Add to Favorites</button>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Player Controls and automatic next song logic */}
-              {currentSong && (
-                <audio
-                  ref={audioRef}
-                  src={currentSong.previewUrl}
-                  autoPlay
-                  onEnded={handleSongEnd}
+              <audio
+                ref={audioRef}
+                onEnded={playNext}
+                style={{ display: "none" }}
+              />
+
+              {currentIndex !== null && songs[currentIndex] && (
+                <PlayerControls
+                  song={songs[currentIndex]}
+                  isPlaying={isPlaying}
+                  playNext={playNext}
+                  playPrev={playPrev}
+                  togglePlayPause={togglePlayPause}
+                  shuffle={shuffle}
+                  toggleShuffle={toggleShuffle}
                 />
               )}
-
-              {currentSong && <PlayerControls song={currentSong} />}
             </>
           }
         />
