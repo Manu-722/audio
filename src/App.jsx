@@ -29,9 +29,11 @@ const App = () => {
   }, []);
 
   const searchMusic = async () => {
-    if (!query.trim()) return; // Prevent empty searches
+    if (!query.trim()) return;
 
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=20`;
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(
+      query
+    )}&media=music&limit=20`;
     try {
       const response = await fetch(url);
       const data = await response.json();
@@ -52,6 +54,10 @@ const App = () => {
     }
   };
 
+  const removeFromFavorites = (trackId) => {
+    setFavorites((prev) => prev.filter((song) => song.trackId !== trackId));
+  };
+
   return (
     <Router>
       <Navbar />
@@ -60,18 +66,36 @@ const App = () => {
           path="/"
           element={
             <>
-              <SearchBar query={query} setQuery={setQuery} searchMusic={searchMusic} />
+              <SearchBar
+                query={query}
+                setQuery={setQuery}
+                searchMusic={searchMusic}
+              />
               {songs.length > 0 && (
                 <div className="search-results">
                   <h2>Search Results:</h2>
                   <div className="song-grid">
                     {songs.map((song) => (
                       <div key={song.trackId} className="card">
-                        <img src={song.artworkUrl100} alt={song.trackName} className="song-image" />
+                        <img
+                          src={song.artworkUrl100}
+                          alt={song.trackName}
+                          className="song-image"
+                        />
                         <h3>{song.trackName}</h3>
                         <p>{song.artistName}</p>
-                        <button onClick={() => setCurrentSong(song)} className="play-btn">Play Song</button>
-                        <button onClick={() => addToFavorites(song)} className="favorite-btn">Add to Favorites</button>
+                        <button
+                          onClick={() => setCurrentSong(song)}
+                          className="play-btn"
+                        >
+                          Play Song
+                        </button>
+                        <button
+                          onClick={() => addToFavorites(song)}
+                          className="favorite-btn"
+                        >
+                          Add to Favorites
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -81,8 +105,23 @@ const App = () => {
             </>
           }
         />
-        <Route path="/favorites" element={user ? <FavoritesPage favorites={favorites} /> : <Login />} />
-        <Route path="/playlist" element={user ? <PlaylistPage /> : <Login />} />
+        <Route
+          path="/favorites"
+          element={
+            user ? (
+              <FavoritesPage
+                favorites={favorites}
+                removeFromFavorites={removeFromFavorites}
+              />
+            ) : (
+              <Login />
+            )
+          }
+        />
+        <Route
+          path="/playlist"
+          element={user ? <PlaylistPage /> : <Login />}
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Signup />} />
       </Routes>
