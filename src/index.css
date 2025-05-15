@@ -460,3 +460,35 @@ body {
     padding: 15px;
   }
 }
+/* Sorting Dropdown */
+.sort-container {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.sort-container select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+/* Remove Button */
+.remove-btn {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.remove-btn:hover {
+  background-color: #d9363e;
+}
