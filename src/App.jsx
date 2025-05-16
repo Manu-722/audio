@@ -20,6 +20,8 @@ const App = () => {
   const [songs, setSongs] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [playlist, setPlaylist] = useState([]);
+  const [playlistName, setPlaylistName] = useState("");
   const [user, setUser] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [shuffle, setShuffle] = useState(false);
@@ -50,7 +52,7 @@ const App = () => {
       audioRef.current.play();
       setIsPlaying(true);
     }
-  }, [currentIndex]);
+  }, [currentIndex, songs]);
 
   const searchMusic = async (term) => {
     if (!term.trim()) return;
@@ -83,6 +85,12 @@ const App = () => {
 
   const removeFromFavorites = (trackId) => {
     setFavorites((prev) => prev.filter((song) => song.trackId !== trackId));
+  };
+
+  const addToPlaylist = (song) => {
+    if (!playlist.find((track) => track.trackId === song.trackId)) {
+      setPlaylist([...playlist, song]);
+    }
   };
 
   const playSong = (index) => {
@@ -159,6 +167,7 @@ const App = () => {
                         <p>{song.artistName}</p>
                         <button onClick={() => playSong(index)} className="play-btn">Play</button>
                         <button onClick={() => addToFavorites(song)} className="favorite-btn">Add to Favorites</button>
+                        <button onClick={() => addToPlaylist(song)} className="playlist-btn">Add to Playlist</button>
                       </div>
                     ))}
                   </div>
@@ -185,6 +194,7 @@ const App = () => {
             </>
           }
         />
+
         <Route
           path="/favorites"
           element={
@@ -198,7 +208,23 @@ const App = () => {
             )
           }
         />
-        <Route path="/playlist" element={user ? <PlaylistPage /> : <Login />} />
+
+        <Route
+          path="/playlist"
+          element={
+            user ? (
+              <PlaylistPage
+                playlist={playlist}
+                setPlaylist={setPlaylist}
+                playlistName={playlistName}
+                setPlaylistName={setPlaylistName}
+              />
+            ) : (
+              <Login />
+            )
+          }
+        />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Signup />} />
       </Routes>

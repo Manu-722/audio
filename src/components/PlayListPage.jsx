@@ -1,13 +1,8 @@
-import { useState } from "react";
+import React from "react";
 
-const PlaylistPage = () => {
-  const [playlist, setPlaylist] = useState([]);
-  const [playlistName, setPlaylistName] = useState("");
-
-  const addToPlaylist = (song) => {
-    if (!playlist.find((track) => track.trackId === song.trackId)) {
-      setPlaylist([...playlist, song]);
-    }
+const PlaylistPage = ({ playlist, setPlaylist, playlistName, setPlaylistName }) => {
+  const removeFromPlaylist = (trackId) => {
+    setPlaylist(playlist.filter((song) => song.trackId !== trackId));
   };
 
   return (
@@ -18,10 +13,13 @@ const PlaylistPage = () => {
         value={playlistName}
         onChange={(e) => setPlaylistName(e.target.value)}
         placeholder="Enter playlist name"
+        className="playlist-input"
       />
       <h3>{playlistName || "My Playlist"}</h3>
       <div className="playlist-grid">
-        {playlist.length === 0 ? <p>No songs in playlist yet.</p> :
+        {playlist.length === 0 ? (
+          <p>No songs in playlist yet.</p>
+        ) : (
           playlist.map((song) => (
             <div key={song.trackId} className="card">
               <img src={song.artworkUrl100} alt={song.trackName} />
@@ -31,9 +29,12 @@ const PlaylistPage = () => {
                 <source src={song.previewUrl} type="audio/mpeg" />
                 Your browser does not support the audio element.
               </audio>
+              <button onClick={() => removeFromPlaylist(song.trackId)} className="remove-btn">
+                Remove
+              </button>
             </div>
           ))
-        }
+        )}
       </div>
     </div>
   );
