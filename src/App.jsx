@@ -7,7 +7,7 @@ import Navbar from "./components/Navbar";
 import SearchBar from "./components/SearchBar";
 import PlayerControls from "./components/PlayerControls";
 import FavoritesPage from "./components/FavoritesPage";
-import PlaylistPage from "./components/PlaylistPage";
+import PlaylistPage from "./components/PlayListPage";
 import Login from "./components/Login";
 import Signup from "./components/Register";
 
